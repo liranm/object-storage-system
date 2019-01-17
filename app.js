@@ -1,8 +1,9 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const multer = require('multer');
+const fs = require('fs');
 
-const upload = multer();
+const upload = multer({ dest: 'uploads/' })
 
 const File = require('./models/File');
 
@@ -14,6 +15,11 @@ const app = express();
 const port = 3000;
 
 app.post('/', upload.single('file_path') , async (req, res) => {
+    const db = await mongoose.connection.db;
+    const gridFSBucket = new mongoose.mongo.GridFSBucket(db);
+
+    fs.createReadStream(req.file.path).pipe(gridFSBucket.openUploadStream(req.file.filename));
+    
     console.log(req.file);
     res.json(req.file);
 });
