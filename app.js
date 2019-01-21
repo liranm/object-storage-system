@@ -2,6 +2,7 @@ const express = require('express');
 const mongoose = require('mongoose');
 const multer = require('multer');
 const fs = require('fs');
+const uniqid = require('uniqid'); 
 
 const upload = multer({ dest: 'uploads/' })
 
@@ -17,9 +18,20 @@ const port = 3000;
 app.post('/', upload.single('file_path') , async (req, res) => {
     const db = await mongoose.connection.db;
     const gridFSBucket = new mongoose.mongo.GridFSBucket(db);
+    const privateUrl = uniqid();
 
-    fs.createReadStream(req.file.path).pipe(gridFSBucket.openUploadStream(req.file.filename));
-    
+    fs.createReadStream(req.file.path)
+        .pipe(gridFSBucket.openUploadStream(privateUrl))
+        .on('finish', async () => {
+            await File.create({
+                owner: req.body.owner,
+                mode: req.body.mode,
+                private_url: privateUrl,
+                public_url: req.body.public_url,
+                size: req.file.size
+            });
+        });
+
     console.log(req.file);
     res.json(req.file);
 });
