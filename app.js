@@ -10,7 +10,10 @@ const File = require('./models/File');
 
 const db_url = 'mongodb://localhost/files';
 
-mongoose.connect(db_url, { useNewUrlParser: true });
+mongoose.connect(db_url, {
+    useNewUrlParser: true,
+    useCreateIndex: true
+});
 
 const app = express();
 const port = 3000;
