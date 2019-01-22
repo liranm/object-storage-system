@@ -39,10 +39,23 @@ app.post('/', upload.single('file_path') , async (req, res) => {
     res.json(req.file);
 });
 
-app.get('/', async (req, res) => {
-    const filesCount = await File.countDocuments();
-    
-    res.send(`Total Files: ${filesCount}`);
+app.get(':filename(*)', async (req, res) => {
+    const { filename } = req.params;
+
+    const fileDoc = await File.findOne({ $or: [ { private_url: filename }, { public_url: filename } ] });
+
+    if(!fileDoc) {
+        return res.status(404).send('File not found.');
+    }
+
+    if(fileDoc.mode === 'private' && req.header('X-AUTH') !== fileDoc.owner) {
+        return res.status(403).send('Access denied - Private file.');
+    }
+
+    const db = await mongoose.connection.db;
+    const gridFSBucket = new mongoose.mongo.GridFSBucket(db);
+
+    gridFSBucket.openDownloadStreamByName(fileDoc.private_url).pipe(res);
 });
 
 app.listen(port, () => console.log(`Example app listening on port ${port}!`));
