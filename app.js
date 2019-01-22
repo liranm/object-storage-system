@@ -87,7 +87,6 @@ app.post('/', upload.single('file_path') , async (req, res) => {
     const privateUrl = `/${uniqid()}`;
 
     fs.createReadStream(req.file.path)
-        .pipe(gridFSBucket.openUploadStream(privateUrl))
         .on('finish', async () => {
             await File.create({
                 owner: req.body.owner,
@@ -96,10 +95,10 @@ app.post('/', upload.single('file_path') , async (req, res) => {
                 public_url: req.body.public_url,
                 size: req.file.size
             });
-        });
 
-    console.log(req.file);
-    res.json(req.file);
+            res.status(200).send('Upload complete.');
+        })
+        .pipe(gridFSBucket.openUploadStream(privateUrl));
 });
 
 app.get(':filename(*)', async (req, res) => {
