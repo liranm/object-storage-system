@@ -21,6 +21,33 @@ const port = 3000;
 
 app.use(bodyParser.urlencoded({ extended: false }));
 
+app.delete('/delete', async (req, res) => {
+    if(!req.body.filename) {
+        return res.status(400).send('Missing required data.');
+    }
+
+    const { filename } = req.body;
+    const fileDoc = await File.findOne({ $or: [ { private_url: filename }, { public_url: filename } ] });
+
+    if(!fileDoc) {
+        return res.status(404).send('File not found.');
+    }
+
+    if(req.header('X-AUTH') !== fileDoc.owner) {
+        return res.status(401).send('Authentication failed.');
+    }
+
+    if(fileDoc.removedAt) {
+        return res.status(200).send(`File has already been deleted.`);
+    }
+
+    fileDoc.set({ removedAt: new Date() });
+
+    await fileDoc.save();
+
+    return res.status(200).send(`File deleted successfully.`);
+});
+
 app.put('/modify', async (req, res) => {
     if(!req.body.mode || !req.body.filename) {
         return res.status(400).send('Missing required data.');
