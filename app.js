@@ -67,6 +67,10 @@ app.put('/modify', async (req, res) => {
                 return res.status(401).send('Authentication failed.');
             }
 
+            if(fileDoc.removedAt) {
+                return res.status(404).send('File not found.');
+            }
+
             if(mode === fileDoc.mode) {
                 return res.status(200).send(`Mode is already ${mode}`);
             }
@@ -118,6 +122,10 @@ app.get(':filename(*)', async (req, res) => {
         const { public_url, size, updatedAt, removedAt } = fileDoc;
 
         return res.json({ public_url, size, updatedAt, removedAt });
+    }
+
+    if(fileDoc.removedAt) {
+        return res.status(404).send('File not found.');
     }
 
     const db = await mongoose.connection.db;
