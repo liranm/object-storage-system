@@ -21,7 +21,7 @@ const port = 3000;
 app.post('/', upload.single('file_path') , async (req, res) => {
     const db = await mongoose.connection.db;
     const gridFSBucket = new mongoose.mongo.GridFSBucket(db);
-    const privateUrl = uniqid();
+    const privateUrl = `/${uniqid()}`;
 
     fs.createReadStream(req.file.path)
         .pipe(gridFSBucket.openUploadStream(privateUrl))
