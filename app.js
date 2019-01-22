@@ -52,6 +52,12 @@ app.get(':filename(*)', async (req, res) => {
         return res.status(403).send('Access denied - Private file.');
     }
 
+    if(req.query.metadata) {
+        const { public_url, size, updatedAt, removedAt } = fileDoc;
+
+        return res.json({ public_url, size, updatedAt, removedAt });
+    }
+
     const db = await mongoose.connection.db;
     const gridFSBucket = new mongoose.mongo.GridFSBucket(db);
 
