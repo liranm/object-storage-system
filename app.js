@@ -86,23 +86,49 @@ app.put('/modify', async (req, res) => {
 });
 
 app.post('/', upload.single('file_path') , async (req, res) => {
+    const { owner, mode, public_url } = req.body;
+    if(!owner || !mode || !public_url) {
+        return res.status(400).send('Missing required data.');
+    }
+
+    const fileDoc = await File.findOne({ public_url });
+    
+    if(!fileDoc) {
+        const db = await mongoose.connection.db;
+        const gridFSBucket = new mongoose.mongo.GridFSBucket(db);
+        const private_url = `/${uniqid()}`;
+
+        return fs.createReadStream(req.file.path)
+            .pipe(gridFSBucket.openUploadStream(private_url))
+            .on('finish', async () => {
+                await File.create({
+                    owner,
+                    mode,
+                    public_url,
+                    private_url,
+                    size: req.file.size
+                });
+
+                res.status(200).send('Upload complete.');
+            });
+    }
+    
+    if(owner !== fileDoc.owner) {
+        return res.status(403).send('File path already exists. Please choose another.');
+    }
+
     const db = await mongoose.connection.db;
     const gridFSBucket = new mongoose.mongo.GridFSBucket(db);
-    const privateUrl = `/${uniqid()}`;
+    const oldFile = await gridFSBucket.find({ filename: fileDoc.private_url }).next();
+    await gridFSBucket.delete(oldFile._id);
 
-    fs.createReadStream(req.file.path)
+    return fs.createReadStream(req.file.path)
+    .   pipe(gridFSBucket.openUploadStream(fileDoc.private_url))
         .on('finish', async () => {
-            await File.create({
-                owner: req.body.owner,
-                mode: req.body.mode,
-                private_url: privateUrl,
-                public_url: req.body.public_url,
-                size: req.file.size
-            });
-
-            res.status(200).send('Upload complete.');
-        })
-        .pipe(gridFSBucket.openUploadStream(privateUrl));
+            fileDoc.set({ size: req.file.size });
+            await fileDoc.save();    
+            res.status(200).send('Overwrite complete.');
+        }); 
 });
 
 app.get(':filename(*)', async (req, res) => {
