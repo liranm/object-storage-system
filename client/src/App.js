@@ -1,12 +1,14 @@
 import React, { Component } from 'react';
 import './App.css';
+import UploadForm from './components/UploadForm';
 
 class App extends Component {
   render() {
     return (
       <div className="App">
-        <header className="App-header">
-        </header>
+        <section className="App-content">
+          <UploadForm/>
+        </section>
       </div>
     );
   }
