@@ -4,6 +4,7 @@ const multer = require('multer');
 const fs = require('fs');
 const uniqid = require('uniqid');
 const bodyParser = require('body-parser');
+const cors = require('cors');
 
 const upload = multer({ dest: 'uploads/' })
 
@@ -19,6 +20,7 @@ mongoose.connect(db_url, {
 const app = express();
 const port = 3000;
 
+app.use(cors());
 app.use(bodyParser.urlencoded({ extended: false }));
 
 app.delete('/delete', async (req, res) => {
