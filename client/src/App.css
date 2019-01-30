@@ -1,3 +1,7 @@
+*:focus {
+  outline: none;
+}
+
 .App {
   text-align: center;
 }
@@ -11,4 +15,52 @@
   justify-content: center;
   font-size: calc(10px + 2vmin);
   color: white;
+  font-family: monospace;
+}
+
+.upload-form {
+  color: #F1E9DB;
+  background-color: #A39B8B;
+  padding: 20px;
+  width: 80vw;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  border-radius: 3px;
+}
+
+.upload-form__label {
+ margin-bottom: 2px;
+}
+
+.upload-form__input {
+  margin-bottom: 10px;
+  font-family: inherit;
+}
+
+.upload-form__text-input {
+  width: 100%;
+}
+
+.upload-form__select-input {
+  width: 100%;
+  padding: 4px;
+  border-radius: 3px;
+}
+
+.upload-form__submit-button {
+  font-size: 2rem;
+  padding: 1rem;
+  border-radius: 10px;
+  border: none;
+  margin-top: 10px;
+  background-color: #5DB7DE;
+  color: #F1E9DB;
+  font-weight: bold;
+  font-family: inherit;
+}
+
+.upload-form__submit-button:active {
+  transform: translateY(1px);
+  filter: saturate(150%);
 }

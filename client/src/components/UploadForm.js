@@ -50,46 +50,48 @@ class UploadForm extends Component {
     
     render() {
         return (
-            <form onSubmit={this.handleSubmit}>
-                <label>
-                    Upload file:
-                    <input
-                        key={this.state.fileInputKey}
-                        type="file"
-                        onChange={this.handleChange}
-                        name="file_path"
-                    />
-                </label>
-                <label>
-                    File path:
-                    <input
-                        type="text"
-                        onChange={this.handleChange}
-                        value={this.state.public_url}
-                        name="public_url"
-                    />
-                </label>
-                <label>
-                    Owner key:
-                    <input
-                        type="text"
-                        onChange={this.handleChange}
-                        value={this.state.owner}
-                        name="owner"
-                    />
-                </label>
-                <label>
-                    File mode:
-                    <select
-                        onChange={this.handleChange}
-                        value={this.state.mode}
-                        name="mode"
-                    >
-                        <option value="public">Public</option>
-                        <option value="private">Private</option>
-                    </select>
-                </label>
-                <button type="submit">Submit</button>
+            <form
+                onSubmit={this.handleSubmit}
+                className="upload-form"
+            >
+                <label className="upload-form__label">Add file</label>
+                <input
+                    key={this.state.fileInputKey}
+                    type="file"
+                    onChange={this.handleChange}
+                    name="file_path"
+                    className="upload-form__input"
+                />
+                <label className="upload-form__label">File public URL</label>
+                <input
+                    type="text"
+                    onChange={this.handleChange}
+                    value={this.state.public_url}
+                    name="public_url"
+                    className="upload-form__input upload-form__text-input"
+                />
+                <label className="upload-form__label">Owner key</label>
+                <input
+                    type="text"
+                    onChange={this.handleChange}
+                    value={this.state.owner}
+                    name="owner"
+                    className="upload-form__input upload-form__text-input"
+                />
+                <label className="upload-form__label">File mode</label>
+                <select
+                    onChange={this.handleChange}
+                    value={this.state.mode}
+                    name="mode"
+                    className="upload-form__input upload-form__select-input"
+                >
+                    <option value="public">Public</option>
+                    <option value="private">Private</option>
+                </select>
+                <button
+                    type="submit"
+                    className="upload-form__submit-button"
+                >Submit</button>
             </form>
         );
     }
