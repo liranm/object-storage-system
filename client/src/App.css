@@ -21,12 +21,13 @@
 .upload-form {
   color: #F1E9DB;
   background-color: #A39B8B;
-  padding: 20px;
+  padding: 60px 20px 20px 20px;
   width: 80vw;
   display: flex;
   flex-direction: column;
   align-items: flex-start;
   border-radius: 3px;
+  position: relative;
 }
 
 .upload-form__label {
@@ -63,4 +64,47 @@
 .upload-form__submit-button:active {
   transform: translateY(1px);
   filter: saturate(150%);
+}
+
+.upload-form__message {
+  font-size: 1rem;
+  position: absolute;
+  left: 20px;
+  top: 20px;
+  border: 1px solid #282c34;
+  width: 90%;
+  border-radius: 3px;
+  padding: 5px;
+  background-color: #A39C76;
+  transition: opacity 0.5s ease;
+}
+
+.upload-form__loader--running {
+  animation: loader 1s ease 0s infinite;
+}
+
+.upload-form__loader--paused {
+  animation: none;
+}
+
+.hide {
+  opacity: 0;
+}
+
+.show {
+  opacity: 1;
+}
+
+@keyframes loader {
+  0% {
+    opacity: 0;
+  }
+
+  50% {
+    opacity: 1;
+
+  }
+  100% {
+    opacity: 0;
+  }
 }

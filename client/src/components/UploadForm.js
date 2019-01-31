@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import classNames from 'classnames';
 
 class UploadForm extends Component {
     constructor(props) {
@@ -8,12 +9,17 @@ class UploadForm extends Component {
             public_url: '',
             owner: '',
             mode: 'public',
-            fileInputKey: Date.now()
+            fileInputKey: Date.now(),
+            message: '',
+            showMessage: false,
+            showLoader: false
         };
     }
 
     handleSubmit = (event) => {
         event.preventDefault();
+        
+        this.setState({ showLoader: true });
         
         const formData = new FormData();
 
@@ -26,18 +32,35 @@ class UploadForm extends Component {
             method: 'POST',
             body: formData
         })
-            .then(response => response.text())
-            .catch(error => console.error('Error:', error))
-            .then(response => {
-                console.log('Success:', response);
+            .then(response => 
+                new Promise(resolve => {
+                    response
+                        .text()
+                        .then(message => {
+                            resolve({ message, status: response.status });
+                        });
+                })
+            )
+            .then(({ message, status }) => {
                 this.setState({
-                    file_path: '',
-                    public_url: '',
-                    owner: '',
-                    mode: 'public',
-                    fileInputKey: Date.now()
+                    message,
+                    showMessage: true,
+                    showLoader: false
                 });
+                
+                if(status === 200) {
+                    this.setState({
+                        file_path: '',
+                        public_url: '',
+                        owner: '',
+                        mode: 'public',
+                        fileInputKey: Date.now()
+                    });
+                }
+        
+                setTimeout(() => this.setState({ showMessage: false }), 3000);
             });
+                
     }
 
     handleChange = (event) => {
@@ -54,6 +77,15 @@ class UploadForm extends Component {
                 onSubmit={this.handleSubmit}
                 className="upload-form"
             >
+                <span
+                    className={classNames({
+                        'upload-form__message': true,
+                        'show': this.state.showMessage,
+                        'hide': !this.state.showMessage
+                    })}
+                >
+                    {this.state.message}
+                </span>
                 <label className="upload-form__label">Add file</label>
                 <input
                     key={this.state.fileInputKey}
@@ -88,6 +120,16 @@ class UploadForm extends Component {
                     <option value="public">Public</option>
                     <option value="private">Private</option>
                 </select>
+                <span 
+                    className={classNames({
+                        'upload-form__loader--running': this.state.showLoader,
+                        'upload-form__loader--paused': !this.state.showLoader,
+                        'show': this.state.showLoader,
+                        'hide': !this.state.showLoader
+                    })}
+                >
+                    Uploading...
+                </span>
                 <button
                     type="submit"
                     className="upload-form__submit-button"
